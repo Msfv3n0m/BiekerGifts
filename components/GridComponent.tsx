@@ -1,11 +1,13 @@
 "use client";
 
+
+import { BsFillTrash3Fill, BsPencilSquare } from "react-icons/bs";
 import { AgGridReact } from 'ag-grid-react';
 import { useEffect, useState } from "react";
 import type { ColDef } from "ag-grid-community";
 import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
 import { db } from "../services/FirebaseService";
-import { doc, getDoc, deleteDoc, getDocs, addDoc, updateDoc, query, collection, where } from "firebase/firestore";
+import { doc, getDoc, deleteDoc, getDocs, addDoc, updateDoc, query, collection, where, DocumentData } from "firebase/firestore";
 import LinkRenderer from "./LinkRenderer";
 
 
@@ -19,7 +21,7 @@ type WishRow = {
 };
 
 
-  const handleCellUpdate = async (params: any) => {
+  const handleCellUpdate = async (params: DocumentData) => {
     const updatedRow = params.data as WishRow;
     try {
       await updateDoc(doc(db, "Wishes", updatedRow.id), {
@@ -34,7 +36,7 @@ type WishRow = {
 
 
 const GridComponent = () => {
-  const [rowData, setRowData] = useState<any[]>([]);
+  const [rowData, setRowData] = useState<WishRow[]>([]);
 
 
 const handleDelete = async (id: string) => {
@@ -48,7 +50,7 @@ const handleDelete = async (id: string) => {
 };
 
 
-  const [columnDefs, setColumnDefs] = useState<ColDef[]>([
+  const [columnDefs, setColumnDefs] = useState<object[]>([
     { field: "Name", editable: true },
     { field: "Note", editable: true },
     { 
@@ -58,24 +60,30 @@ const handleDelete = async (id: string) => {
     },
     {
       headerName: "Actions",
-      cellRenderer: (params: any) => {
+      cellRenderer: (params: DocumentData) => {
         return (
           <button
             onClick={() => handleDelete(params.data.id)}
-            style={{ color: "white", background: "red", border: "none", padding: "4px 8px" }}
+            style={{
+              color: "white",
+              background: "red",
+              border: "none",
+              padding: "6px",
+              borderRadius: "4px",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center"
+            }}
           >
-            Delete
+          <BsFillTrash3Fill />
           </button>
         );
       },
     }
 
+
   ]);
-
-
-  useEffect(() => {
-    void loadData();
-  }, []);
 
   async function loadData() {
     const q = query(collection(db, "Wishes"));
@@ -89,6 +97,11 @@ const handleDelete = async (id: string) => {
     setRowData(rows);
   }
 
+  useEffect(() => {
+    void loadData();
+  }, []);
+
+
   const handleCreate = async () => {
     await addDoc(collection(db, "Wishes"), { Name: "", Note: "", Link: "" });
     await loadData(); // refresh once after creating the doc
@@ -97,8 +110,23 @@ const handleDelete = async (id: string) => {
 
   return (
     <div style={{ width: "100%", height: "50vh" }}>
+            <button
+            onClick={() => handleCreate()}
+            style={{
+              color: "white",
+              background: "Green",
+              border: "none",
+              padding: "6px",
+              borderRadius: "4px",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center"
+            }}
+          >
+          <BsPencilSquare />
+          </button>
       <AgGridReact rowData={rowData} columnDefs={columnDefs} onCellValueChanged={handleCellUpdate}/>
-      <button type="button" onClick={handleCreate}>Click Me</button>
 
     </div>
   );
