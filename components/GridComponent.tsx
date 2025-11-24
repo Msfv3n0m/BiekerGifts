@@ -10,35 +10,33 @@ import { doc, getDoc, getDocs, query, collection, where } from "firebase/firesto
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
+
+type CityRow = {
+  id: string;
+  city: string;
+};
+
 const GridComponent = () => {
-  const q = query(collection(db, "cities"));
-  const querySnapshot = getDocs(q);
-  const arr = [[{value: "doc id"}, {value: "name"}]];
-  querySnapshot.then((input) => input.forEach((doc) => {
-  querySnapshot.then((input) =>
-    input.forEach((doc) => {
-    arr.push([{value: doc.id}, {value: doc.data().name}])
-    console.log(`${doc.id} => ${doc.data().name}`);
-  }))}));
   const [rowData, setRowData] = useState<any[]>([]);
 
   const [columnDefs, setColumnDefs] = useState<ColDef[]>([
-    { field: "athlete", editable: true },
-    { field: "age" },
-    { field: "date" },
-    { field: "country" },
-    { field: "sport" },
-    { field: "gold" },
-    { field: "silver" },
-    { field: "bronze" },
-    { field: "total" },
+    { field: "id", editable: true },
+    { field: "city", editable: true },
   ]);
 
   useEffect(() => {
-    fetch("https://www.ag-grid.com/example-assets/olympic-winners.json") // Fetch data from server
-      .then((result) => result.json()) // Convert to JSON
-      .then((rowData) => setRowData(rowData)); // Update state of `rowData`
+    async function loadData() {
+      const q = query(collection(db, "cities"));
+      const snapshot = await getDocs(q);
+      const rows: CityRow[] = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        city: doc.data().name ?? "",
+      }));
+      setRowData(rows);
+    }
+    loadData();
   }, []);
+
 
   return (
     <div style={{ width: "100%", height: "100vh" }}>
