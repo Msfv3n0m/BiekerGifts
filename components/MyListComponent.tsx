@@ -4,10 +4,9 @@
 import { BsFillTrash3Fill, BsPencilSquare } from "react-icons/bs";
 import { AgGridReact } from 'ag-grid-react';
 import { useEffect, useState } from "react";
-import type { ColDef } from "ag-grid-community";
 import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
 import { db } from "../services/FirebaseService";
-import { doc, getDoc, deleteDoc, getDocs, addDoc, updateDoc, query, collection, where, DocumentData } from "firebase/firestore";
+import { doc, deleteDoc, getDocs, addDoc, updateDoc, query, collection, where, DocumentData } from "firebase/firestore";
 import LinkRenderer from "./LinkRenderer";
 
 
@@ -35,7 +34,7 @@ type WishRow = {
   };
 
 
-const GridComponent = () => {
+const MyListComponent = () => {
   const [rowData, setRowData] = useState<WishRow[]>([]);
 
 
@@ -103,7 +102,7 @@ const handleDelete = async (id: string) => {
 
 
   const handleCreate = async () => {
-    await addDoc(collection(db, "Wishes"), { Name: "", Note: "", Link: "" });
+    await addDoc(collection(db, "Wishes"), { Name: "", Note: "", Link: "", WantedBy: "Jared", ClaimedBy: "" });
     await loadData(); // refresh once after creating the doc
   };
 
@@ -132,4 +131,4 @@ const handleDelete = async (id: string) => {
   );
 };
 
-export default GridComponent;
+export default MyListComponent;

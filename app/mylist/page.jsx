@@ -1,11 +1,11 @@
-import GridComponent from "../../components/GridComponent";
+import MyListComponent from "../../components/MyListComponent";
 import NavBar from "../../components/NavBar";
 
 export default function Home() {
   return (
     <div >
      <NavBar /> 
-      <GridComponent />
+      <MyListComponent />
     </div>
   );
 }
