@@ -25,7 +25,7 @@ type WishRow = {
     const updatedRow = params.data as WishRow;
     try {
       await updateDoc(doc(db, "Wishes", updatedRow.id), {
-        WantedBy: updatedRow.WantedBy,
+        ClaimedBy: updatedRow.ClaimedBy,
       });
     } catch (err) {
       console.error("Failed to update Firestore:", err);
@@ -58,7 +58,7 @@ useEffect(() => {
     const snapshot = await getDocs(q);
     const rows = snapshot.docs.map(doc => ({
       id: doc.id,
-      ClaimedBy: doc.data().CreatedBy ?? "",
+      ClaimedBy: doc.data().ClaimedBy ?? "",
       Name: doc.data().Name ?? "",
       Note: doc.data().Note ?? "",
       Link: doc.data().Link ?? "",
