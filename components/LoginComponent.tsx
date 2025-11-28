@@ -7,7 +7,7 @@ export default function Home() {
   
   return (
     <div>
-     <button onClick={() => signInWithPopup(auth, provider)}>Sign in with Google</button>
+     <button onClick={() => signInWithRedirect(auth, provider)}>Sign in with Google</button>
      <button onClick={() => signOut(auth)}>Sign out</button>
     </div>
   );
