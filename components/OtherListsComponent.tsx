@@ -129,19 +129,14 @@ const OtherListsComponent: React.FC = () => {
         title: "Link",
         field: "Link",
         sorter: "string",
-        formatter: (cell) => {
-          const url = String(cell.getValue() ?? "").trim();
-          if (!url) {
-            return "<span style='color:#888'>(none)</span>";
-          }
-          // Basic sanitization: allow only http/https to prevent javascript: URLs
-          const safe =
-            url.startsWith("http://") || url.startsWith("https://")
-              ? url
-              : `https://${url}`;
-          const text = escapeHtml(url);
-          return `${safe}${text}</a>`;
-        },
+        formatter: 'link',
+    formatterParams: {
+      labelField: "Link",        // text shown in the anchor
+      urlField: "Link",          // URL the anchor points to
+      target: "_blank",          // open in new tab
+      // Optional: customize classes or aria-label
+      // className: "my-link",
+    },
       },
       {
         title: "Claimed By",

@@ -10,17 +10,17 @@ interface INavbarProps {}
 const navItems = [
   {
     id: "mylist",
-    label: "mylist",
+    label: "My List",
     href: "/mylist",
   },
   {
     id: "otherlists",
-    label: "otherlists",
+    label: "Other Lists",
     href: "/otherlists",
   },
   {
     id: "login",
-    label: "login",
+    label: "Login",
     href: "/login",
   },
 ];
@@ -35,7 +35,7 @@ const Navbar: React.FunctionComponent<INavbarProps> = (props) => {
         href="/"
         className="text-lg md:text-3xl font-bold text-spotify-green"
       >
-        webapp
+        BiekerGifts
       </Link>
      <ul className="flex justify-end items-center gap-4">
         {navItems.map((eachItem) => (
