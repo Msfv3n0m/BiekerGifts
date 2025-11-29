@@ -8,7 +8,7 @@ import "tabulator-tables/dist/css/tabulator.min.css"; // core Tabulator styles
 
 import { BsFillTrash3Fill, BsPencilSquare } from "react-icons/bs";
 
-import { db } from "../services/FirebaseService";
+import { db,auth } from "../services/FirebaseService";
 import {
   doc,
   deleteDoc,
@@ -50,7 +50,7 @@ const MyListComponent: React.FC = () => {
       Name: "",
       Note: "",
       Link: "",
-      WantedBy: "Jared",
+      WantedBy: auth.currentUser?.displayName,
       ClaimedBy: "",
     });
     await loadData(); // refresh after creating
