@@ -4,7 +4,7 @@ import Link from "next/link";
 import React, {useEffect, useState} from "react";
 import { usePathname } from "next/navigation";
 import { Url } from "next/dist/shared/lib/router/router";
-import { getAuth, onAuthStateChanged, signInWithPopup, signOut, GoogleAuthProvider, signInWithRedirect } from "firebase/auth";
+import { getAuth, onAuthStateChanged, signInWithPopup, signOut, GoogleAuthProvider, User, signInWithRedirect } from "firebase/auth";
 import { auth} from "../services/FirebaseService";
 import { useRouter } from "next/navigation";
 
@@ -32,7 +32,7 @@ const navItems = [
 const Navbar: React.FunctionComponent<INavbarProps> = (props) => {
   const pathname = usePathname();
   const isActive = (path: Url) => pathname === path;
-  const [user, setUser] = useState(null);
+const [user, setUser] = useState<User | null>(null);
   const provider = new GoogleAuthProvider();
   const router = useRouter();
 
