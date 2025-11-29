@@ -3,8 +3,8 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import { ReactTabulator, ColumnDefinition } from "react-tabulator";
-import "react-tabulator/lib/styles.css"; // react-tabulator helpers
-import "tabulator-tables/dist/css/tabulator.min.css"; // core Tabulator styles
+import "react-tabulator/lib/styles.css";
+import "tabulator-tables/dist/css/tabulator.min.css";
 
 import { db } from "../services/FirebaseService";
 import {
@@ -29,10 +29,8 @@ type WishRow = {
 const OtherListsComponent: React.FC = () => {
   const [rowData, setRowData] = useState<WishRow[]>([]);
 
-  // ---- Fetch Firestore data ----
   useEffect(() => {
     const fetchData = async () => {
-      // "!=" requires orderBy on the same field
       const q = query(
         collection(db, "Wishes"),
         where("WantedBy", "!=", "Jared"),
@@ -58,36 +56,33 @@ const OtherListsComponent: React.FC = () => {
     void fetchData();
   }, []);
 
-  // Helper to guard getDocs with a readable error
   async function getdocsSafe(q: any) {
     try {
       return await getDocs(q);
     } catch (e) {
-      console.error("Failed to query Firestore. If you use '!=' make sure you have a composite index and orderBy the same field.", e);
+      console.error(
+        "Failed to query Firestore. If you use '!=' make sure you have a composite index and orderBy the same field.",
+        e
+      );
       throw e;
     }
   }
 
-  // Build a map of unique WantedBy values for the select filter
+  // Unique WantedBy -> values map for select filter (with "All")
   const wantedByFilterValues = useMemo(() => {
     const set = new Set<string>();
     for (const r of rowData) {
       if (r.WantedBy && r.WantedBy.trim().length > 0) set.add(r.WantedBy);
     }
-    // Tabulator expects either an array or an object map.
-    // Using an object map preserves labels and values cleanly.
-    const values: Record<string, string> = {};
+    const values: Record<string, string> = { "": "All (everyone)" };
     Array.from(set)
       .sort((a, b) => a.localeCompare(b))
       .forEach((v) => {
         values[v] = v;
       });
-    // Optionally add an empty option that shows "All"
-    // values[""] = "All";
     return values;
   }, [rowData]);
 
-  // ---- Inline edit handler (only persist ClaimedBy) ----
   const onCellEdited = async (cell: any) => {
     const field: keyof WishRow = cell.getColumn().getField();
     if (field !== "ClaimedBy") return;
@@ -107,19 +102,31 @@ const OtherListsComponent: React.FC = () => {
     }
   };
 
-  // ---- Column definitions ----
   const columns: ColumnDefinition[] = useMemo(
     () => [
-      // Filter by unique values using select header filter (computed from rowData)
       {
         title: "Wanted By",
         field: "WantedBy",
+
+        // 1) Helper caption in the header to signal filtering
+        headerFormatter: () =>
+          `
+            <div style="display:flex; flex-direction:column; line-height:1.15">
+              <span style="font-weight:600;">Wanted By</span>
+              <small style="color:#6b7280;">Filter who wants an item</small>
+            </div>
+          `,
+
+        // 2) The actual filter box (select dropdown) under the header
         headerFilter: "select",
         headerFilterParams: {
-          // Using computed unique values rather than `true`
-          values: wantedByFilterValues,
-          // Optionally include "All" prompt
-          // clearable: true,
+          values: wantedByFilterValues, // includes "All (everyone)" as empty value
+          clearable: true,              // shows a clear control for the filter
+        },
+        // Optional: treat empty selection as show-all
+        headerFilterFunc: (headerValue: string, rowValue: string) => {
+          if (!headerValue) return true; // "All" -> no filtering
+          return rowValue === headerValue;
         },
         sorter: "string",
       },
@@ -129,14 +136,12 @@ const OtherListsComponent: React.FC = () => {
         title: "Link",
         field: "Link",
         sorter: "string",
-        formatter: 'link',
-    formatterParams: {
-      labelField: "Link",        // text shown in the anchor
-      urlField: "Link",          // URL the anchor points to
-      target: "_blank",          // open in new tab
-      // Optional: customize classes or aria-label
-      // className: "my-link",
-    },
+        formatter: "link",
+        formatterParams: {
+          labelField: "Link",
+          urlField: "Link",
+          target: "_blank",
+        },
       },
       {
         title: "Claimed By",
@@ -149,7 +154,6 @@ const OtherListsComponent: React.FC = () => {
     [wantedByFilterValues]
   );
 
-  // ---- Table options ----
   const options = {
     layout: "fitColumns",
     reactiveData: true,
@@ -161,22 +165,11 @@ const OtherListsComponent: React.FC = () => {
         data={rowData}
         columns={columns}
         options={options}
-        events={{
-          cellEdited: onCellEdited,
-        }}
+        events={{ cellEdited: onCellEdited }}
         className="react-tabulator"
       />
     </div>
   );
 };
-
-// Utility to escape text for display in HTML
-function escapeHtml(s: string) {
-  return s
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}
 
 export default OtherListsComponent;
